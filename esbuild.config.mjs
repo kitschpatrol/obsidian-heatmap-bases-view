@@ -1,6 +1,7 @@
 import esbuild from "esbuild";
 import process from "process";
 import builtins from "builtin-modules";
+import { copyFileSync, mkdirSync } from "fs";
 
 const banner =
 `/*
@@ -37,13 +38,19 @@ const context = await esbuild.context({
 	logLevel: "info",
 	sourcemap: prod ? false : "inline",
 	treeShaking: true,
-	outfile: "main.js",
+	outfile: "dist/main.js",
 	minify: prod,
 });
 
 if (prod) {
 	await context.rebuild();
+	mkdirSync("dist", { recursive: true });
+	copyFileSync("manifest.json", "dist/manifest.json");
+	copyFileSync("styles.css", "dist/styles.css");
 	process.exit(0);
 } else {
+	mkdirSync("dist", { recursive: true });
+	copyFileSync("manifest.json", "dist/manifest.json");
+	copyFileSync("styles.css", "dist/styles.css");
 	await context.watch();
 }

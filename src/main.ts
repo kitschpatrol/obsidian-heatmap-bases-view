@@ -1,4 +1,4 @@
-import { App, Modal, Plugin, PluginSettingTab, Setting, QueryController, ViewOption } from 'obsidian';
+import { App, Modal, Plugin, PluginSettingTab, Setting, QueryController } from 'obsidian';
 import { HeatmapView } from './HeatmapView';
 import { HeatmapPluginSettings, DEFAULT_SETTINGS, ColorSchemeItem, DEFAULT_COLOR_SCHEMES } from './types';
 import { isValidHexColor } from './colorUtils';
@@ -31,7 +31,7 @@ export default class HeatmapPlugin extends Plugin {
 			factory: (controller: QueryController, containerEl: HTMLElement) => {
 				return new HeatmapView(controller, containerEl, this);
 			},
-			options: (): ViewOption[] => [
+			options: () => [
 				{
 					type: 'property',
 					key: 'dateProperty',
