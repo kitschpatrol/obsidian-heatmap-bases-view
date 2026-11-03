@@ -1,31 +1,36 @@
-# vscode
-.vscode
+# Git Ignore
+# Also used by CSpell, Stylelint, and ESLint
 
-# Intellij
-*.iml
-.idea
-
-# npm
-node_modules
-
-# Don't include the compiled main.js file in the repo.
-# They should be uploaded to GitHub releases instead.
-main.js
-
-# Build output
-dist/
-
-# Exclude sourcemaps
-*.map
-
-# obsidian
-data.json
-
-# Exclude macOS Finder (System Explorer) View States
+# @kitschpatrol/repo-config boilerplate
+!.env.example
+.agents/
+.astro/
+.claude/
 .DS_Store
-
-# Test coverage
+.env
+.env.*
+.eslint-config-inspector
+.pnpm-store/
+.svelte-kit/
+.vitest/
+.worktrees/
+{tmp,temp}/
+**/*.min.js
+/scratch/
+bower_components/
+build/
 coverage/
+dist/
+node_modules/
+skills-lock.json
+vendor/
 
-# Claude Code local settings
-.claude/settings.local.json
+# Customizations
+
+# Obsidian
+data.json
+.hotreload
+resources/
+zip/
+/examples/Heatmap Demo Vault/.obsidian/workspace.json
+/examples/Heatmap Demo Vault/.obsidian/plugins/heatmap-bases-view

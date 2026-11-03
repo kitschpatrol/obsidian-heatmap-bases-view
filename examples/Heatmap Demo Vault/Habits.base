@@ -1,0 +1,15 @@
+filters:
+  and:
+    - file.inFolder("Daily Notes")
+views:
+  - type: heatmap
+    name: Exercise
+    valueProperty: note.exercise
+    startDate: "2026-01-01"
+    endDate: "2026-01-31"
+  - type: heatmap
+    name: Mood
+    valueProperty: note.mood
+    startDate: "2026-01-01"
+    endDate: "2026-01-31"
+    layoutDirection: vertical

@@ -1,0 +1,54 @@
+upstreams:
+  - repo: ppeirce/obsidian-heatmap-bases-view
+    parent: true
+
+verify: pnpm ci && pnpm build && pnpm lint && pnpm test
+extra_allowed_tools: Bash(pnpm:*)
+
+guidance: |
+  This is an intentional fork of ppeirce/obsidian-heatmap-bases-view. Incorporate
+  upstream bug fixes and compatible features while preserving the fork's
+  behavior and the changes documented in README.md under "Fork changes".
+  Understand both sides of conflicts and adapt upstream changes to this
+  repository's structure. If an upstream change conflicts with the fork's
+  purpose, preserve the fork's behavior and explain the omitted or adapted
+  change in the PR for maintainer review.
+
+  Preserve the "heatmap" Bases view registration, the hover link source ID, and
+  the existing view option keys: dateProperty, valueProperty, startDate, endDate,
+  colorScheme, weekStart, showWeekdayLabels, showMonthLabels, layoutDirection,
+  cellSize, minValue, and maxValue. Preserve the colorSchemes and
+  showHexColorInTooltip plugin settings, so that saved Bases and plugin data
+  keep working.
+
+  Keep the settings tab exclusively declarative through getSettingDefinitions(),
+  with a control binding for showHexColorInTooltip and a list definition for
+  colorSchemes. The color scheme editor stays a modal, because the declarative
+  API only applies to setting tabs. Do not restore imperative display() rendering
+  or lower the Obsidian 1.15.0 minimum.
+
+  This fork renamed and split upstream's source files, so port implementation
+  changes as follows: src/colorUtils.ts to src/color-utils.ts, src/dateUtils.ts
+  to src/date-utils.ts, src/HeatmapView.ts to src/heatmap-view.ts, the root
+  styles.css to src/styles.css, and src/__mocks__/obsidian.ts to
+  test/mocks/obsidian.ts. Port upstream's src/main.ts into src/main.ts,
+  src/register-heatmap-view.ts, src/settings/defaults.ts,
+  src/settings/settings.ts, and src/settings/edit-scheme-modal.ts. Keep tests
+  beside the modules they cover and match this repository's lint and formatting
+  conventions.
+
+  Keep pnpm, @kitschpatrol/shared-config, the TypeScript build scripts, the demo
+  vault, and the existing build, lint, and test configuration. Regenerate the
+  pnpm lockfile with pnpm when dependency changes require it. Do not restore
+  upstream's package-lock.json, esbuild.config.mjs, version-bump.mjs,
+  versions.json, husky hooks, committed main.js, AGENTS.md, CLAUDE.md,
+  RELEASING.md, spec.md, plans/, or .beads/.
+
+  Preserve the obsidian-heatmap-bases-view package name, heatmap-bases-view
+  plugin ID, fork repository metadata, versioning, attribution, and original
+  copyright notice. Generate root and dist manifests from package.json rather
+  than editing them by hand. Keep GitHub release distribution, including the
+  plugin files and installation ZIP; do not restore community registry
+  submission tooling or npm publication. Preserve the fork-specific README and
+  let mdat regenerate its placeholder sections. Run the configured verification
+  command and report any failures or uncertainty.

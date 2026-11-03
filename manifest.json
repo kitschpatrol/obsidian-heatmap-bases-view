@@ -1,10 +1,10 @@
 {
-	"id": "heatmap-bases-view",
-	"name": "Heatmap Bases View",
-	"version": "1.0.6",
-	"minAppVersion": "1.10.0",
-	"description": "A GitHub-contributions-style heatmap view for Bases. Visualize boolean or numeric properties from daily notes over time.",
-	"author": "Peter Peirce",
-	"authorUrl": "https://github.com/ppeirce",
-	"isDesktopOnly": false
+  "author": "Kitschpatrol",
+  "authorUrl": "https://ericmika.com",
+  "description": "A GitHub-contributions-style heatmap view for Bases. Visualize boolean or numeric properties from daily notes over time.",
+  "id": "heatmap-bases-view",
+  "version": "1.0.6",
+  "isDesktopOnly": false,
+  "minAppVersion": "1.15.0",
+  "name": "Heatmap Bases View"
 }

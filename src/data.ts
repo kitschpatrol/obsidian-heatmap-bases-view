@@ -1,102 +1,93 @@
-import {
-	BasesEntry,
-	BasesPropertyId,
-	NumberValue,
-	BooleanValue,
-	StringValue,
-	NullValue,
-	DateValue,
-} from 'obsidian';
-import { HeatmapEntry, ProcessedData } from './types';
-import { parseDateFromFilename, formatDateISO, parseISODateString } from './dateUtils';
+import type { BasesEntry, BasesPropertyId } from 'obsidian'
+import { BooleanValue, DateValue, NullValue, NumberValue, StringValue } from 'obsidian'
+import type { HeatmapEntry, ProcessedData } from './types'
+import { formatDateISO, parseDateFromFilename, parseISODateString } from './date-utils'
 
 /**
  * Value types that can be visualized in the heatmap.
  */
-export type ValueType = 'boolean' | 'number' | 'unsupported';
+export type ValueType = 'boolean' | 'number' | 'unsupported'
 
 /**
- * Convert a property name to BasesPropertyId format.
- * Property IDs are formatted as "type.name"
+ * Convert a property name to BasesPropertyId format. Property IDs are formatted
+ * as "type.name"
  */
 function toPropertyId(propertyName: string): BasesPropertyId {
-	// If it already looks like a property ID, use it as-is
-	if (propertyName.includes('.')) {
-		return propertyName as BasesPropertyId;
-	}
-	// Default to frontmatter property
-	return `frontmatter.${propertyName}` as BasesPropertyId;
+	// Bare property names refer to frontmatter. Preserve qualified IDs as-is.
+	return (
+		propertyName.includes('.') ? propertyName : `frontmatter.${propertyName}`
+	) as BasesPropertyId
 }
 
 /**
  * Extract the date from a BasesEntry based on configuration.
  */
-export function extractDate(
-	entry: BasesEntry,
-	dateProperty: string
-): string | null {
+export function extractDate(entry: BasesEntry, dateProperty: string): null | string {
 	if (dateProperty === '__filename__' || !dateProperty) {
 		// Parse from filename
 		try {
-			const parsed = parseDateFromFilename(entry.file.basename);
+			const parsed = parseDateFromFilename(entry.file.basename)
 			if (!parsed) {
-				console.warn(
-					`Failed to parse date from filename: "${entry.file.basename}"`,
-					{ file: entry.file.path }
-				);
-				return null;
+				console.warn(`Failed to parse date from filename: "${entry.file.basename}"`, {
+					file: entry.file.path,
+				})
+				return null
 			}
-			return formatDateISO(parsed);
+
+			return formatDateISO(parsed)
 		} catch (error) {
-			console.warn(
-				`Error parsing date from filename: "${entry.file.basename}"`,
-				{ file: entry.file.path, error: String(error) }
-			);
-			return null;
+			console.warn(`Error parsing date from filename: "${entry.file.basename}"`, {
+				error: String(error),
+				file: entry.file.path,
+			})
+			return null
 		}
 	}
 
 	// Get from property
-	const propId = toPropertyId(dateProperty);
-	const value = entry.getValue(propId);
+	const propId = toPropertyId(dateProperty)
+	const value = entry.getValue(propId)
 
 	if (value === null || value instanceof NullValue) {
-		return null;
+		return null
 	}
 
 	try {
 		// Handle DateValue directly
 		if (value instanceof DateValue) {
-			const dateStr = value.toString();
+			const dateString = value.toString()
 			// DateValue.toString() should return ISO format
-			const parsed = parseISODateString(dateStr) ?? new Date(dateStr);
-			if (isNaN(parsed.getTime())) {
-				console.warn(
-					`Invalid date in property "${dateProperty}": "${dateStr}"`,
-					{ file: entry.file.path, property: dateProperty }
-				);
-				return null;
+			const parsed = parseISODateString(dateString) ?? new Date(dateString)
+			if (Number.isNaN(parsed.getTime())) {
+				console.warn(`Invalid date in property "${dateProperty}": "${dateString}"`, {
+					file: entry.file.path,
+					property: dateProperty,
+				})
+				return null
 			}
-			return formatDateISO(parsed);
+
+			return formatDateISO(parsed)
 		}
 
 		// Try to parse from string representation
-		const strValue = value.toString();
-		const parsed = parseISODateString(strValue) ?? new Date(strValue);
-		if (isNaN(parsed.getTime())) {
-			console.warn(
-				`Invalid date in property "${dateProperty}": "${strValue}"`,
-				{ file: entry.file.path, property: dateProperty }
-			);
-			return null;
+		const stringValue = value.toString()
+		const parsed = parseISODateString(stringValue) ?? new Date(stringValue)
+		if (Number.isNaN(parsed.getTime())) {
+			console.warn(`Invalid date in property "${dateProperty}": "${stringValue}"`, {
+				file: entry.file.path,
+				property: dateProperty,
+			})
+			return null
 		}
-		return formatDateISO(parsed);
+
+		return formatDateISO(parsed)
 	} catch (error) {
-		console.warn(
-			`Error parsing date from property "${dateProperty}"`,
-			{ file: entry.file.path, property: dateProperty, error: String(error) }
-		);
-		return null;
+		console.warn(`Error parsing date from property "${dateProperty}"`, {
+			error: String(error),
+			file: entry.file.path,
+			property: dateProperty,
+		})
+		return null
 	}
 }
 
@@ -105,81 +96,83 @@ export function extractDate(
  */
 export function extractValue(
 	entry: BasesEntry,
-	valueProperty: string
-): { value: number | null; displayValue: string; type: ValueType } {
-	const propId = toPropertyId(valueProperty);
-	const obsidianValue = entry.getValue(propId);
+	valueProperty: string,
+): { displayValue: string; type: ValueType; value: null | number } {
+	const propId = toPropertyId(valueProperty)
+	const obsidianValue = entry.getValue(propId)
 
 	// Handle missing/null property
 	if (obsidianValue === null || obsidianValue instanceof NullValue) {
-		return { value: null, displayValue: `${valueProperty}: not set`, type: 'unsupported' };
+		return { displayValue: `${valueProperty}: not set`, type: 'unsupported', value: null }
 	}
 
 	// Handle BooleanValue
 	if (obsidianValue instanceof BooleanValue) {
-		const boolVal = obsidianValue.isTruthy();
+		const boolValue = obsidianValue.isTruthy()
 		return {
-			value: boolVal ? 1 : 0,
-			displayValue: boolVal ? 'Yes' : 'No',
+			displayValue: boolValue ? 'Yes' : 'No',
 			type: 'boolean',
-		};
+			value: boolValue ? 1 : 0,
+		}
 	}
 
 	// Handle NumberValue
 	if (obsidianValue instanceof NumberValue) {
-		const numVal = Number(obsidianValue.toString());
-		if (isNaN(numVal)) {
+		const numberValue = Number(obsidianValue.toString())
+		if (Number.isNaN(numberValue)) {
 			return {
-				value: null,
 				displayValue: obsidianValue.toString(),
 				type: 'unsupported',
-			};
+				value: null,
+			}
 		}
+
 		return {
-			value: numVal,
-			displayValue: String(numVal),
+			displayValue: String(numberValue),
 			type: 'number',
-		};
+			value: numberValue,
+		}
 	}
 
 	// Handle StringValue - try to parse as number or boolean
 	if (obsidianValue instanceof StringValue) {
-		const strVal = obsidianValue.toString();
+		const stringValue = obsidianValue.toString()
 
 		// Try parsing as number
-		const num = parseFloat(strVal);
-		if (!isNaN(num)) {
+		const numericValue = parseFloat(stringValue)
+		if (!Number.isNaN(numericValue)) {
 			return {
-				value: num,
-				displayValue: strVal,
+				displayValue: stringValue,
 				type: 'number',
-			};
+				value: numericValue,
+			}
 		}
 
 		// Try parsing as boolean strings
-		const lower = strVal.toLowerCase();
+		const lower = stringValue.toLowerCase()
 		if (lower === 'true' || lower === 'yes') {
-			return { value: 1, displayValue: 'Yes', type: 'boolean' };
+			return { displayValue: 'Yes', type: 'boolean', value: 1 }
 		}
+
 		if (lower === 'false' || lower === 'no') {
-			return { value: 0, displayValue: 'No', type: 'boolean' };
+			return { displayValue: 'No', type: 'boolean', value: 0 }
 		}
 
 		// Unsupported string
 		return {
-			value: null,
-			displayValue: strVal,
+			displayValue: stringValue,
 			type: 'unsupported',
-		};
+			value: null,
+		}
 	}
 
 	// Fallback - try to use isTruthy() for other Value types
-	const isTruthy = obsidianValue.isTruthy();
+	const isTruthy = obsidianValue.isTruthy()
 	return {
-		value: isTruthy ? 1 : 0,
 		displayValue: obsidianValue.toString(),
 		type: 'boolean',
-	};
+		value: isTruthy ? 1 : 0,
+	}
 }
 
 /**
@@ -188,54 +181,60 @@ export function extractValue(
 export function processData(
 	entries: BasesEntry[],
 	dateProperty: string,
-	valueProperty: string
+	valueProperty: string,
 ): ProcessedData {
-	const heatmapEntries = new Map<string, HeatmapEntry>();
-	let min = Infinity;
-	let max = -Infinity;
-	let count = 0;
-	let hasNumeric = false;
-	let skippedEntries = 0;
+	const heatmapEntries = new Map<string, HeatmapEntry>()
+	let min = Infinity
+	let max = -Infinity
+	let count = 0
+	let hasNumeric = false
+	let skippedEntries = 0
 
 	for (const entry of entries) {
-		const date = extractDate(entry, dateProperty);
+		const date = extractDate(entry, dateProperty)
 		if (!date) {
-			skippedEntries++;
-			continue; // Skip entries without valid dates
+			skippedEntries++
+			continue // Skip entries without valid dates
 		}
 
-		const { value, displayValue, type } = extractValue(entry, valueProperty);
+		const { displayValue, type, value } = extractValue(entry, valueProperty)
 
 		// Track if we have numeric values (not just boolean)
 		if (type === 'number' && value !== null && value !== 0 && value !== 1) {
-			hasNumeric = true;
+			hasNumeric = true
 		}
 
 		// Update stats for non-null values (including 0)
 		if (value !== null) {
-			min = Math.min(min, value);
-			max = Math.max(max, value);
-			count++;
+			min = Math.min(min, value)
+			max = Math.max(max, value)
+			count++
 		}
 
 		// If multiple entries have the same date, keep the one with higher value
 		// or the first one if equal
-		const existing = heatmapEntries.get(date);
+		const existing = heatmapEntries.get(date)
 		if (existing) {
 			if (value !== null && (existing.value === null || value > existing.value)) {
-				heatmapEntries.set(date, { date, value, note: entry.file, displayValue });
+				heatmapEntries.set(date, { date, displayValue, note: entry.file, value })
 			}
 		} else {
-			heatmapEntries.set(date, { date, value, note: entry.file, displayValue });
+			heatmapEntries.set(date, { date, displayValue, note: entry.file, value })
 		}
 	}
 
 	// Handle edge cases
-	if (min === Infinity) min = 0;
-	if (max === -Infinity) max = 1;
+	if (min === Infinity) {
+		min = 0
+	}
+
+	if (max === -Infinity) {
+		max = 1
+	}
+
 	if (min === max && min > 0) {
 		// Single value case - set min to 0 for better intensity scaling
-		min = 0;
+		min = 0
 	}
 
 	// Log summary if entries were skipped
@@ -243,23 +242,23 @@ export function processData(
 		console.warn(
 			`Data processing summary: ${skippedEntries} entries skipped due to invalid dates.`,
 			{
-				totalEntries: entries.length,
+				dateProperty,
 				skippedEntries,
 				successfulEntries: heatmapEntries.size,
-				dateProperty,
-			}
-		);
+				totalEntries: entries.length,
+			},
+		)
 	}
 
 	return {
 		entries: heatmapEntries,
 		stats: {
-			min,
-			max,
 			count,
 			hasNumeric,
+			max,
+			min,
 		},
-	};
+	}
 }
 
 /**
@@ -268,66 +267,75 @@ export function processData(
 export function detectValueType(
 	entries: BasesEntry[],
 	valueProperty: string,
-	dateProperty: string
+	dateProperty: string,
 ): ValueType {
-	let seenBoolean = false;
-	let seenNumber = false;
-	let seenValidEntry = false;
+	let seenBoolean = false
+	let seenNumber = false
+	let seenValidEntry = false
 
-	const propId = toPropertyId(valueProperty);
+	const propId = toPropertyId(valueProperty)
 
 	for (const entry of entries) {
 		// Only consider entries that have valid dates
-		const date = extractDate(entry, dateProperty);
-		if (!date) continue;
+		const date = extractDate(entry, dateProperty)
+		if (!date) {
+			continue
+		}
 
-		const obsidianValue = entry.getValue(propId);
-		if (obsidianValue === null || obsidianValue instanceof NullValue) continue;
+		const obsidianValue = entry.getValue(propId)
+		if (obsidianValue === null || obsidianValue instanceof NullValue) {
+			continue
+		}
 
-		seenValidEntry = true;
+		seenValidEntry = true
 
 		if (obsidianValue instanceof BooleanValue) {
-			seenBoolean = true;
+			seenBoolean = true
 		} else if (obsidianValue instanceof NumberValue) {
-			const numVal = Number(obsidianValue.toString());
-			if (isNaN(numVal)) {
-				return 'unsupported';
+			const numberValue = Number(obsidianValue.toString())
+			if (Number.isNaN(numberValue)) {
+				return 'unsupported'
 			}
+
 			// Check if it's used as a boolean (0 or 1) or as a real number
-			if (numVal !== 0 && numVal !== 1) {
-				seenNumber = true;
+			if (numberValue === 0 || numberValue === 1) {
+				seenBoolean = true
 			} else {
-				seenBoolean = true;
+				seenNumber = true
 			}
 		} else if (obsidianValue instanceof StringValue) {
-			const strVal = obsidianValue.toString();
-			const num = parseFloat(strVal);
-			if (!isNaN(num)) {
-				if (num !== 0 && num !== 1) {
-					seenNumber = true;
+			const stringValue = obsidianValue.toString()
+			const numericValue = parseFloat(stringValue)
+			if (Number.isNaN(numericValue)) {
+				const lower = stringValue.toLowerCase()
+				if (['false', 'no', 'true', 'yes'].includes(lower)) {
+					seenBoolean = true
 				} else {
-					seenBoolean = true;
+					return 'unsupported'
 				}
+			} else if (numericValue === 0 || numericValue === 1) {
+				seenBoolean = true
 			} else {
-				const lower = strVal.toLowerCase();
-				if (['true', 'false', 'yes', 'no'].includes(lower)) {
-					seenBoolean = true;
-				} else {
-					return 'unsupported';
-				}
+				seenNumber = true
 			}
 		} else {
 			// Other Value types - try to use as boolean via isTruthy
-			seenBoolean = true;
+			seenBoolean = true
 		}
 	}
 
 	// If we didn't see any valid entries, treat as unsupported
 	if (!seenValidEntry) {
-		return 'unsupported';
+		return 'unsupported'
 	}
 
-	if (seenNumber) return 'number';
-	if (seenBoolean) return 'boolean';
-	return 'unsupported';
+	if (seenNumber) {
+		return 'number'
+	}
+
+	if (seenBoolean) {
+		return 'boolean'
+	}
+
+	return 'unsupported'
 }

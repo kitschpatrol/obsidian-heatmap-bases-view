@@ -1,50 +1,73 @@
 {
 	"name": "obsidian-heatmap-bases-view",
-	"version": "1.0.5",
-	"description": "A GitHub-contributions-style heatmap view for Bases",
-	"main": "main.js",
-	"type": "module",
-	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
-		"version": "node version-bump.mjs && git add manifest.json versions.json",
-		"lint": "eslint src",
-		"lint:fix": "eslint src --fix",
-		"test": "vitest run",
-		"test:watch": "vitest",
-		"test:coverage": "vitest run --coverage",
-		"deploy:local": "rsync -a ./dist/ ~/Notes/Vault/.obsidian/plugins/heatmap-bases-view/",
-		"prepare": "husky"
-	},
-	"lint-staged": {
-		"*.ts": "eslint --fix"
-	},
+	"version": "1.0.6",
+	"private": true,
+	"description": "Obsidian plugin that adds a GitHub-contributions-style heatmap view to Bases.",
 	"keywords": [
 		"obsidian",
+		"obsidian-md",
 		"obsidian-plugin",
 		"bases",
 		"heatmap"
 	],
-	"author": "",
-	"license": "MIT",
+	"homepage": "https://github.com/kitschpatrol/obsidian-heatmap-bases-view",
+	"bugs": "https://github.com/kitschpatrol/obsidian-heatmap-bases-view/issues",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/kitschpatrol/obsidian-heatmap-bases-view.git"
+	},
+	"license": "0BSD",
+	"author": {
+		"name": "Eric Mika",
+		"email": "eric@ericmika.com",
+		"url": "https://ericmika.com"
+	},
+	"contributors": [
+		{
+			"name": "Peter Peirce",
+			"url": "https://github.com/ppeirce"
+		}
+	],
+	"type": "module",
+	"main": "./dist/main.js",
+	"scripts": {
+		"build": "tsc --noEmit --skipLibCheck && pnpm build:bundle",
+		"build:bundle": "shx rm -rf ./dist && tsx ./scripts/build.ts production",
+		"clean-deep": "shx rm -f pnpm-lock.yaml && git clean -fdX",
+		"dev": "shx rm -rf ./dist && tsx ./scripts/build.ts",
+		"fix": "ksc fix",
+		"heatmap-bases-view:deploy-local": "shx mkdir -p ~/Notes/Vault/.obsidian/plugins/heatmap-bases-view && shx cp -r ./dist/* ~/Notes/Vault/.obsidian/plugins/heatmap-bases-view",
+		"lint": "ksc lint",
+		"manifest": "tsx ./scripts/generate-manifest.ts",
+		"release": "bumpp package.json manifest.json --execute 'pnpm manifest' --commit 'Release: %s' --tag '%s'",
+		"test": "vitest run",
+		"test:coverage": "vitest run --coverage",
+		"test:watch": "vitest"
+	},
 	"devDependencies": {
-		"@eslint/js": "^9.39.4",
-		"@types/node": "^20.19.37",
-		"@typescript-eslint/eslint-plugin": "^8.57.1",
-		"@typescript-eslint/parser": "^8.57.1",
+		"@kitschpatrol/shared-config": "^8.14.1",
+		"@types/node": "~24.13.6",
 		"@vitest/coverage-v8": "^3.2.4",
-		"builtin-modules": "3.3.0",
-		"esbuild": "0.17.3",
-		"eslint": "^9.39.4",
-		"eslint-plugin-obsidianmd": "^0.1.9",
-		"globals": "^16.5.0",
-		"husky": "^9.1.7",
+		"bumpp": "^12.3.0",
+		"chokidar": "^6.0.0",
+		"esbuild": "^0.28.2",
 		"jsdom": "^27.4.0",
-		"lint-staged": "^16.4.0",
-		"obsidian": "latest",
-		"tslib": "2.4.0",
-		"typescript": "^5.9.3",
-		"typescript-eslint": "^8.57.1",
+		"obsidian": "1.14.4",
+		"shx": "^0.4.0",
+		"tsx": "^4.23.15",
+		"typescript": "~6.0.3",
 		"vitest": "^3.2.4"
+	},
+	"packageManager": "pnpm@12.16.1",
+	"engines": {
+		"node": "^24.16.0 || >=26.3.0"
+	},
+	"obsidian": {
+		"author": "Kitschpatrol",
+		"description": "A GitHub-contributions-style heatmap view for Bases. Visualize boolean or numeric properties from daily notes over time.",
+		"id": "heatmap-bases-view",
+		"isDesktopOnly": false,
+		"minAppVersion": "1.15.0",
+		"name": "Heatmap Bases View"
 	}
 }
