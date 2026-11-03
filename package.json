@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-heatmap-bases-view",
-	"version": "1.0.6",
+	"version": "2.0.0",
 	"private": true,
 	"description": "Obsidian plugin that adds a GitHub-contributions-style heatmap view to Bases.",
 	"keywords": [

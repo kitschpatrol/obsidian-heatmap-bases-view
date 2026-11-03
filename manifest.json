@@ -3,7 +3,7 @@
   "authorUrl": "https://ericmika.com",
   "description": "A GitHub-contributions-style heatmap view for Bases. Visualize boolean or numeric properties from daily notes over time.",
   "id": "heatmap-bases-view",
-  "version": "1.0.6",
+  "version": "2.0.0",
   "isDesktopOnly": false,
   "minAppVersion": "1.15.0",
   "name": "Heatmap Bases View"
