@@ -39,12 +39,13 @@
 		"heatmap-bases-view:deploy-local": "shx mkdir -p ~/Notes/Vault/.obsidian/plugins/heatmap-bases-view && shx cp -r ./dist/* ~/Notes/Vault/.obsidian/plugins/heatmap-bases-view",
 		"lint": "ksc lint",
 		"manifest": "tsx ./scripts/generate-manifest.ts",
-		"release": "bumpp package.json manifest.json --execute 'pnpm manifest' --commit 'Release: %s' --tag '%s'",
+		"release": "pnpm manifest && bumpp package.json manifest.json --commit 'Release: %s' --tag '%s' --all --execute 'chagent'",
 		"test": "vitest run",
 		"test:coverage": "vitest run --coverage",
 		"test:watch": "vitest"
 	},
 	"devDependencies": {
+		"@kitschpatrol/chagent": "0.4.0",
 		"@kitschpatrol/shared-config": "^8.14.1",
 		"@types/node": "~24.13.6",
 		"@vitest/coverage-v8": "^3.2.4",

@@ -1,5 +1,6 @@
 import { cspellConfig } from '@kitschpatrol/cspell-config'
 
 export default cspellConfig({
-	words: ['ebedf', 'linktext'],
+	ignorePaths: ['**/changelog.md'],
+	words: ['chagent', 'ebedf', 'linktext'],
 })

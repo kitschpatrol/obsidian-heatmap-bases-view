@@ -2,7 +2,7 @@ import { eslintConfig } from '@kitschpatrol/eslint-config'
 
 export default eslintConfig(
 	{
-		ignores: ['examples/Heatmap Demo Vault/**'],
+		ignores: ['examples/Heatmap Demo Vault/**', '**/changelog.md'],
 		ts: {
 			overrides: {
 				'jsdoc/require-jsdoc': 'off',
